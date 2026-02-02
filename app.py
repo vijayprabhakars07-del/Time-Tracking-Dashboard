@@ -3,6 +3,10 @@ import pandas as pd
 import os
 from datetime import datetime
 from io import BytesIO
+from zoneinfo import ZoneInfo
+
+# ================== TIMEZONE ==================
+LOCAL_TZ = ZoneInfo("Asia/Kolkata")  # ✅ DEFINE HERE
 
 # ================== CONFIG ==================
 st.set_page_config(
@@ -54,6 +58,12 @@ else:
         if col not in df.columns:
             df[col] = pd.NaT if col in ["Time", "Date"] else ""
     df["Time"] = pd.to_datetime(df["Time"], errors="coerce")
+
+    if df["Time"].dt.tz is None:
+        df["Time"] = df["Time"].dt.tz_localize(LOCAL_TZ)
+    else:
+       df["Time"] = df["Time"].dt.tz_convert(LOCAL_TZ)
+
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.date
     df.to_csv(DATA_FILE, index=False)
 
@@ -95,6 +105,9 @@ if st.button("🔒 Logout"):
 # ================== FUNCTIONS ==================
 def log_action(ib, url, status, stage, action):
     global df
+
+    now = datetime.now(LOCAL_TZ)
+
     df = pd.concat([df, pd.DataFrame([{
         "Employee": st.session_state.user,
         "IB": ib,
@@ -102,9 +115,10 @@ def log_action(ib, url, status, stage, action):
         "Status": status,
         "Stage": stage,
         "Action": action,
-        "Time": datetime.now(),
-        "Date": datetime.now().date()
+        "Time": now,
+        "Date": now.date()
     }])], ignore_index=True)
+
     df.to_csv(DATA_FILE, index=False)
 
 def get_stage_events(ib, stage):
