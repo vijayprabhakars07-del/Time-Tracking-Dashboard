@@ -212,10 +212,11 @@ if st.session_state.user != "admin":
 
         # ---------- ACTION BUTTONS ----------
         with cols[6]:
-            active_key = f"active_{i}_{ib_key}_{stage_key}"
-            pause_key  = f"pause_{i}_{ib_key}_{stage_key}"
-            resume_key = f"resume_{i}_{ib_key}_{stage_key}"
-            stop_key   = f"stop_{i}_{ib_key}_{stage_key}"
+            active_key = f"state_active_{i}"
+            pause_key  = f"state_pause_{i}"
+            resume_key = f"state_resume_{i}"
+            stop_key   = f"state_stop_{i}"
+
 
             st.session_state.setdefault(active_key, False)
             st.session_state.setdefault(pause_key, False)
