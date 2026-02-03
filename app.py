@@ -85,7 +85,20 @@ if not st.session_state.logged_in:
             else:
                 st.error("Invalid credentials")
     st.stop()
+# ================== LOAD USER IBs FROM CSV ==================
+if st.session_state.logged_in and not st.session_state.ib_rows:
+    user_df = df[df["Employee"] == st.session_state.user]
 
+    for ib in user_df["IB"].dropna().unique():
+        latest = user_df[user_df["IB"] == ib].sort_values("Time").iloc[-1]
+
+        st.session_state.ib_rows.append({
+            "ib": ib,
+            "url": latest["URL"],
+            "status": latest["Status"],
+            "stage": latest["Stage"],
+            "date": latest["Date"]
+        })
 # ================== HEADER ==================
 st.markdown(
     f"""
